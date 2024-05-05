@@ -54,9 +54,9 @@ const SignIn = () => {
 		if (result?.url) {
 			setIsSubmitting(false);
 			router.replace("/dashboard");
+			setIsSubmitting(false);
+			form.reset({ identifier: "", password: "" });
 		}
-		setIsSubmitting(false);
-		form.reset({ identifier: "", password: "" });
 	};
 
 	return (

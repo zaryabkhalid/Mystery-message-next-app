@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import type { Metadata } from "next";
 
 interface RootLayout {
@@ -6,8 +5,8 @@ interface RootLayout {
 }
 
 export const metadata: Metadata = {
-	title: "Home",
-	description: "Home Page",
+	title: "Dashboard",
+	description: "User Dashboard Page ",
 };
 
 export default function RootLayout({
@@ -15,10 +14,5 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	return (
-		<div>
-			<Navbar />
-			<div>{children}</div>
-		</div>
-	);
+	return <div>{children}</div>;
 }

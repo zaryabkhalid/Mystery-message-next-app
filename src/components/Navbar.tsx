@@ -4,17 +4,19 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { User } from "next-auth";
 import { Button } from "./ui/button";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, User2Icon } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	DropdownMenuSeparator,
+	DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
-	const { data: session, status } = useSession();
+	const { data: session } = useSession();
 	const { setTheme } = useTheme();
 
 	type menuItems = {
@@ -24,24 +26,25 @@ const Navbar = () => {
 	};
 
 	const menuItems: menuItems[] = [
-		{ id: 0, item: "Home", to: "/" },
-		{ id: 1, item: "About", to: "/about" },
+		{ id: 0, item: "About", to: "/about" },
+		{ id: 1, item: "Blogs", to: "/blogs" },
+		{ id: 2, item: "Projects", to: "/projects" },
 	];
 
 	const user: User = session?.user as User;
 	return (
-		<nav className="fixed w-full top-0 left-0 right-0 flex justify-between bg-zinc-900 items-center shadow  h-20  px-4 md:px-6">
+		<nav className="fixed w-full top-0 left-0 right-0 flex justify-between  items-center shadow-xl  h-20  px-4 md:px-6">
 			<div>
 				<a
-					className="font-bold tracking-tight text-xl bg-zinc-900 p-3 rounded-lg text-white md:text-3xl"
-					href="#">
+					className="font-bold tracking-tight text-xl bg-zinc-900 p-3 rounded-lg text-white  md:text-3xl"
+					href="/">
 					Mystery Message
 				</a>
 			</div>
 
 			<div className=" space-x-4">
 				{menuItems.map((item) => (
-					<Link href={item.to} key={item.id} className="font-bold text-xl ">
+					<Link href={item.to} key={item.id} className="font-semibold text-md ">
 						{item.item}
 					</Link>
 				))}
@@ -50,10 +53,23 @@ const Navbar = () => {
 			<div className="flex justify-center items-center gap-4">
 				{session ? (
 					<>
-						<span className=" text-base font-semibold mr-2">
-							{user?.username || user?.email}
-						</span>
-						<Button onClick={() => signOut()}>Logout</Button>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="outline" size="default">
+									<User2Icon className="mr-2 w-5 h-5" /> Profile
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuLabel>{user.username}</DropdownMenuLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem>
+									<Link href={"/dashboard"}>Dashboard</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => signOut()}>
+									Logout
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</>
 				) : (
 					<>

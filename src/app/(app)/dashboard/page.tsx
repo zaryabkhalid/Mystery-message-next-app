@@ -1,92 +1,58 @@
 "use client";
-
 import MessageCard from "@/components/MessageCard";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { Message } from "@/model/message.model";
 import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
-
 import { Loader2, RefreshCcw } from "lucide-react";
 import { User } from "next-auth";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMessages } from "@/hooks/useMessagesQuery";
 
 const Dashboard = () => {
-	const [messages, setMessages] = useState<Message[]>([]);
-	const [isLoading, setIsLoading] = useState(false);
 	const [isSwitchLoading, setIsSwitchLoading] = useState(false);
 	const { toast } = useToast();
-
-	const handleDeleteMessage = (messageId: string) => {
-		setMessages(messages.filter((message) => message._id !== messageId));
-	};
-
+	const { data, isLoading, isFetching, error, refetch } = useMessages();
 	const { data: session } = useSession();
-
 	const form = useForm({
 		resolver: zodResolver(acceptMessageSchema),
 	});
 
+	const handleDeleteMessage = (messageId: string) => {
+		// setMessages(messages.filter((message) => message._id !== messageId));
+	};
+
 	const { register, watch, setValue } = form;
 	const acceptMessages = watch("acceptMessages");
 
-	const fetchAcceptMessages = useCallback(async () => {
-		setIsLoading(true);
-		try {
-			const response = await axios.get<ApiResponse>("/api/accept-messages");
-			setValue("acceptMessages", response.data.isAcceptingMessage);
-		} catch (error) {
-			const axiosError = error as AxiosError<ApiResponse>;
-			toast({
-				title: "Error",
-				description: axiosError.response?.data.message || "Failed to fetch message setting",
-				variant: "destructive",
-			});
-		} finally {
-			setIsLoading(false);
-		}
-	}, [toast, setValue]);
+	// const fetchAcceptMessages = useCallback(async () => {
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const response = await axios.get<ApiResponse>("/api/accept-messages");
+	// 		setValue("acceptMessages", response.data.isAcceptingMessage);
+	// 	} catch (error) {
+	// 		const axiosError = error as AxiosError<ApiResponse>;
+	// 		toast({
+	// 			title: "Error",
+	// 			description: axiosError.response?.data.message || "Failed to fetch message setting",
+	// 			variant: "destructive",
+	// 		});
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// }, [toast, setValue]);
 
-	const fetchMessages = useCallback(
-		async (refresh: boolean = false) => {
-			setIsLoading(true);
-			setIsSwitchLoading(false);
-			try {
-				const response = await axios.get<ApiResponse>("/api/get-messages");
-				setMessages(response.data.messages || []);
-				if (refresh) {
-					toast({
-						title: "Refreshed Messages",
-						description: "Showing latest messages",
-					});
-				}
-			} catch (error) {
-				const axiosError = error as AxiosError<ApiResponse>;
-				toast({
-					title: "Error",
-					description:
-						axiosError.response?.data.message || "Failed to fetch message setting",
-					variant: "destructive",
-				});
-			} finally {
-				setIsLoading(false);
-				setIsSwitchLoading(false);
-			}
-		},
-		[setIsLoading, setMessages, toast]
-	);
-
-	useEffect(() => {
-		if (!session || !session.user) return;
-		fetchMessages();
-		fetchAcceptMessages();
-	}, [session, setValue, toast, fetchAcceptMessages, fetchMessages]);
+	// useEffect(() => {
+	// 	if (!session || !session.user) return;
+	// 	fetchMessages();
+	// 	fetchAcceptMessages();
+	// }, [session, setValue, toast, fetchAcceptMessages, fetchMessages]);
 
 	//  handle Switch change
 	const handleSwitchChange = async () => {
@@ -155,30 +121,29 @@ const Dashboard = () => {
 				</div>
 				<Separator />
 
-				<Button
-					className="mt-4"
-					variant="outline"
-					onClick={(e) => {
-						e.preventDefault();
-						fetchMessages(true);
-					}}>
-					{isLoading ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
-					) : (
-						<RefreshCcw className="h-4 w-4" />
-					)}
+				<Button className="mt-4" variant="outline" onClick={() => refetch()}>
+					Refresh <RefreshCcw className=" ml-2 h-4 w-4" />
 				</Button>
-				<div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-					{messages.length > 0 ? (
-						messages.map((message, index) => (
-							<MessageCard
-								key={message._id}
-								message={message}
-								onMessageDelete={handleDeleteMessage}
-							/>
-						))
+
+				<div>
+					{isFetching ? (
+						<Loader2 className="h-24 w-24 animate-spin mx-auto" />
 					) : (
-						<p>No messages to display.</p>
+						<div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+							{data?.data.messages && data.data?.messages?.length > 0 ? (
+								data?.data?.messages?.map((message) => {
+									return (
+										<MessageCard
+											key={message._id}
+											onMessageDelete={handleDeleteMessage}
+											message={message}
+										/>
+									);
+								})
+							) : (
+								<p>No Messages To display</p>
+							)}
+						</div>
 					)}
 				</div>
 			</div>

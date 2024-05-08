@@ -19,8 +19,8 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<AuthProvider>
+		<AuthProvider>
+			<html lang="en">
 				<body className={inter.className}>
 					<ThemeProvider
 						attribute="class"
@@ -33,7 +33,7 @@ export default function RootLayout({
 						<Toaster />
 					</ThemeProvider>
 				</body>
-			</AuthProvider>
-		</html>
+			</html>
+		</AuthProvider>
 	);
 }

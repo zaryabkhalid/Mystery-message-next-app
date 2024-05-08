@@ -6,8 +6,8 @@ interface RootLayout {
 }
 
 export const metadata: Metadata = {
-	title: "Home",
-	description: "Home Page",
+	title: "Mystery Message",
+	description: "This is the main page of the mystery message web app.",
 };
 
 export default function RootLayout({

@@ -1,4 +1,3 @@
-"use client";
 import { Message } from "@/model/message.model";
 import { useToast } from "./ui/use-toast";
 import { Button } from "./ui/button";
@@ -14,25 +13,24 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import axios from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import dayjs from "dayjs";
 
 type MessageProps = {
 	message: Message;
-	onMessageDelete: (messageId: string) => void;
 };
 
-const MessageCard = ({ message, onMessageDelete }: MessageProps) => {
+const MessageCard = ({ message }: MessageProps) => {
 	const { toast } = useToast();
 
 	const handleDeleteConfirm = async () => {
 		const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`);
+
 		toast({
 			title: response.data.message,
 		});
-		onMessageDelete(message._id);
 	};
 
 	return (
@@ -43,8 +41,8 @@ const MessageCard = ({ message, onMessageDelete }: MessageProps) => {
 						<CardTitle>Mystery Message</CardTitle>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button variant="destructive">
-									<X className="h-5 w-5" />
+								<Button variant="default" className="bg-red-600">
+									<Trash2 className="h-5 w-5 text-slate-200" />
 								</Button>
 							</AlertDialogTrigger>
 							<AlertDialogContent>

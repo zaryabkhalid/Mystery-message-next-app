@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { User } from "next-auth";
 import { Button } from "./ui/button";
-import { Sun, Moon, User2Icon } from "lucide-react";
+import { Sun, Moon, User2Icon, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
 	DropdownMenu,
@@ -65,8 +65,10 @@ const Navbar = () => {
 								<DropdownMenuItem>
 									<Link href={"/dashboard"}>Dashboard</Link>
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => signOut()}>
-									Logout
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={() => signOut()}>
+									Logout <LogOut className="h-5 w-5 ml-2" />
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>

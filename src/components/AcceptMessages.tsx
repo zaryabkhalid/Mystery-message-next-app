@@ -4,10 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { acceptMessageSchema } from "@/schemas/acceptMessageSchema";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import { useMemo } from "react";
 import { Badge } from "./ui/badge";
+import { useMutation } from "@tanstack/react-query";
 
 const AcceptMessages = () => {
 	const { data, isLoading } = useAcceptMessageQuery();
@@ -22,37 +23,47 @@ const AcceptMessages = () => {
 		setValue("acceptMessages", data?.isAcceptingMessage);
 	}, [data?.isAcceptingMessage, setValue]);
 
-	const acceptMessages = watch("acceptMessages");
-
-	const handleSwitchChange = async () => {
-		try {
+	const mutation = useMutation({
+		mutationKey: ["updateAcceptMessageStatus"],
+		mutationFn: async (acceptMessages: boolean) => {
 			const response = await axios.post<ApiResponse>("/api/accept-messages", {
 				acceptMessages: !acceptMessages,
 			});
 
+			// For optimistic update
 			setValue("acceptMessages", !acceptMessages);
 
+			return response?.data;
+		},
+		onSuccess: (data) => {
 			toast({
-				title: response.data.message,
-				variant: "default",
+				title: "Accepting Message Status",
+				description: `User is Accepting Message: ${!acceptMessages}`,
 				duration: 2000,
+				variant: "default",
 			});
-		} catch (error) {
-			const axiosError = error as AxiosError<ApiResponse>;
+		},
+		onError: (error: any) => {
+			console.log("Error Occur while updating accept message status", error);
 			toast({
 				title: "Error",
-				description: axiosError.response?.data.message || "Failed to fetch message setting",
+				description: "Something went wrong while updating accept message status ",
 				variant: "destructive",
+				duration: 2000,
 			});
-		}
-	};
+		},
+	});
+
+	const acceptMessages = watch("acceptMessages");
 
 	return (
 		<div className="my-8 flex items-center">
 			<Switch
 				{...register("acceptMessages")}
 				checked={acceptMessages}
-				onCheckedChange={handleSwitchChange}
+				onCheckedChange={() => {
+					mutation.mutate(acceptMessages);
+				}}
 				disabled={isLoading}
 			/>
 			<span className=" ml-3">

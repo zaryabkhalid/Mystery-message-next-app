@@ -52,7 +52,6 @@ const SendMessages = ({ username }: SendMessageProps) => {
 			});
 			form.reset();
 		} catch (error) {
-			console.error(error);
 			const axiosError = error as AxiosError<ApiResponse>;
 
 			toast({

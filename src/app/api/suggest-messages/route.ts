@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 		// Ask OpenAI for a streaming chat completion given the prompt
 		const response = await openai.completions.create({
 			model: process.env.OPENAPI_CHAT_MODEL!,
-			max_tokens: 100,
+			max_tokens: 400,
 			stream: true,
 			prompt,
 		});

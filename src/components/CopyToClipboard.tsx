@@ -3,9 +3,11 @@ import { Button } from "./ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Session, User } from "next-auth";
 import { Copy } from "lucide-react";
+import { useQRCode } from "next-qrcode";
 
 const CopyToClipboard = ({ session }: { session: Session }) => {
 	const { toast } = useToast();
+	const { Canvas } = useQRCode();
 
 	const { username } = session?.user as User;
 	const baseUrl = `${window.location.protocol}//${window.location.host}`;
@@ -32,6 +34,23 @@ const CopyToClipboard = ({ session }: { session: Session }) => {
 					className="input input-bordered w-full p-2 mr-2"
 				/>
 				<Button onClick={copyToClipboard}>Copy</Button>
+			</div>
+
+			<div className="my-4">
+				<Canvas
+					text={profileUrl}
+					options={{
+						type: "image/jpeg",
+						quality: 0.9,
+						errorCorrectionLevel: "M",
+						margin: 2,
+						width: 200,
+						color: {
+							dark: "0a0a0a",
+							light: "eaeaea",
+						},
+					}}
+				/>
 			</div>
 		</div>
 	);
